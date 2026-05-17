@@ -1,0 +1,185 @@
+## SOP: Build and Configure an Active Directory Lab on Windows Server 2025 in Azure
+
+### Objective
+
+Create a fully functional Active Directory domain controller in Microsoft Azure, then configure core identity, organizational, policy, and help desk administration tasks. This SOP provides a repeatable workflow for setting up the lab, validating the environment, and performing common day-one IT support actions.
+
+### Key Steps
+
+**1. Prepare the Azure lab environment and connect to the server** [1:07](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=67)
+
+![generated-image-at-00:01:07](https://loom.com/i/00575101a56f4058bad46253f287f607?workflows_screenshot=true)
+
+- Sign in to Microsoft Azure and locate the virtual machine created for the lab.
+- Download the RDP file for the VM and connect remotely.
+- Confirm the VM is running before proceeding.
+- Enable clipboard sharing in the RDP settings so commands can be copied from your local machine into the server.
+- Verify you are connected to the Windows Server desktop and can access Server Manager.
+
+**2. Confirm the server platform and required roles** [1:43](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=103)
+
+![generated-image-at-00:01:43](https://loom.com/i/680778ab17e04d9fb67e8ae34f1fd33e?workflows_screenshot=true)
+
+- Verify the server is running **Windows Server 2025 Datacenter** in Azure.
+- Confirm the VM size is appropriate for the lab environment (the walkthrough uses a small B2 VM).
+- Open **Server Manager** and confirm the required roles are present: 
+  - Active Directory Domain Services (AD DS)
+  - DNS
+- Open PowerShell or PowerShell ISE to begin validation and administration tasks.
+- Run a verification command such as `Get-ADDomainController` to confirm the server is functioning as a domain controller.
+
+**3. Install AD DS and promote the server to a domain controller** [3:26](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=206)
+
+![generated-image-at-00:03:26](https://loom.com/i/2ac033f83d3242fdbd579a0882584ff9?workflows_screenshot=true)
+
+- In **Server Manager**, go to **Manage &gt; Add Roles and Features**.
+- Select and install the **Active Directory Domain Services** role.
+- Install supporting management tools and any required policy components.
+- Promote the server to a domain controller.
+- Create the domain **lab.local** during promotion.
+- Confirm the server is now the authoritative domain controller and DNS source for the domain.
+
+**4. Create the Active Directory organizational structure** [4:36](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=276)
+
+![generated-image-at-00:04:36](https://loom.com/i/88d40baf147547c0a34675a9d1b5d5f3?workflows_screenshot=true)
+
+- Open **Active Directory Users and Computers**.
+- Create the following Organizational Units (OUs): 
+  - IT
+  - Finance
+  - HR
+  - Sales
+  - Computers
+- Use OUs to separate users and devices by department.
+- Treat OUs as the structure that Group Policy will target later.
+- Keep computer accounts in a separate OU for easier management and policy application.
+
+**5. Create department users and security groups** [5:45](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=345)
+
+![generated-image-at-00:05:45](https://loom.com/i/3ccd76d38a904361ba0e91a3745eb7e8?workflows_screenshot=true)
+
+- For each department, create a security group to control access.
+- Create one user account per department for the lab: 
+  - Alice.Chen — IT
+  - Bob.Patel — Finance
+  - Carol.Jones — HR
+  - David.Smith — Sales
+- Add each user to the correct department security group.
+- Use group membership instead of assigning permissions directly to users.
+- Verify that access is controlled through role-based access control (RBAC) via group membership.
+
+**6. Verify group membership with PowerShell** [6:30](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=390)
+
+![generated-image-at-00:06:30](https://loom.com/i/d266c5f02fe94390b7e47e4c58c89274?workflows_screenshot=true)
+
+- Open PowerShell and run a group membership verification command.
+- Confirm that each user is assigned to the correct department group.
+- Use this step to validate that access will be inherited correctly from the group.
+- Remember the operating principle: 
+  - Assign permissions to groups
+  - Add or remove users from groups as needed
+- Use this method to scale access management efficiently across many users.
+
+**7. Create and link the IT security Group Policy Object** [7:39](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=459)
+
+![generated-image-at-00:07:39](https://loom.com/i/f0760da240914620a4a787ece5c7f439?workflows_screenshot=true)
+
+- In **Server Manager**, go to **Tools &gt; Group Policy Management**.
+- Right-click the **IT** OU and create a new GPO linked to that OU.
+- Name the GPO **IT Security Policy**.
+- Confirm the link prompt and save the new policy.
+- Open the GPO for editing so you can configure security settings.
+
+**8. Configure password and logon security settings** [8:20](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=500)
+
+![generated-image-at-00:08:20](https://loom.com/i/51910c1e1b944fe991d3116a01616a31?workflows_screenshot=true)
+
+- In the GPO editor, navigate to the security policy settings.
+- Set **Minimum password length** to **12 characters**.
+- Enable **Password must meet complexity requirements**.
+- Configure interactive logon settings under computer configuration.
+- Set the interactive logon limit to **900 seconds**.
+- Apply and save the policy changes.
+
+**9. Restrict removable storage access** [10:00](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=600)
+
+![generated-image-at-00:10:00](https://loom.com/i/a9ecad041fb74d50b9fb8386f0d6b6da?workflows_screenshot=true)
+
+- In the same GPO, navigate to the removable storage policy area.
+- Locate the setting for **All Removable Storage classes**.
+- Set the policy to **Deny all access**.
+- Enable the policy and save the configuration.
+- Use this control to reduce data leakage and unauthorized device use.
+
+**10. Perform a password reset for a user account** [10:56](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=656)
+
+![generated-image-at-00:10:56](https://loom.com/i/82c29eca7e694f2f898f0534c5172196?workflows_screenshot=true)
+
+- Open PowerShell to perform a help desk-style password reset.
+- Reset **Bob.Patel**’s password using the appropriate account command.
+- Set the account so the user must change the password at next logon.
+- Use a secure string when entering the new password.
+- Confirm the command runs without errors before moving on.
+
+**11. Unlock a locked account** [15:17](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=917)
+
+![generated-image-at-00:15:17](https://loom.com/i/cf4c981034db487a8b313ac3b41f0a33?workflows_screenshot=true)
+
+- Identify the locked user account that needs to be restored.
+- Use PowerShell to unlock **Carol.Jones**’s account.
+- Confirm the command completes successfully with no errors.
+- Verify the account is available for the user to log in again.
+- Use this process when a user is locked out after failed sign-in attempts.
+
+**12. Disable a departing employee account** [16:23](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=983)
+
+![generated-image-at-00:16:23](https://loom.com/i/e64ab89d426544e897d52c2b9d2512a7?workflows_screenshot=true)
+
+- Identify the user account for the departing employee.
+- Disable **David.Smith**’s account instead of deleting it.
+- Preserve the account for audit history, group membership, and compliance needs.
+- Understand that disabling is reversible, while deletion is permanent.
+- Use this approach when an employee leaves the organization.
+
+**13. Audit account status and confirm changes** [17:21](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=1041)
+
+![generated-image-at-00:17:21](https://loom.com/i/3519bb8b44e14823a3577a50bad83e24?workflows_screenshot=true)
+
+- Run a search or query to list account status changes.
+- Confirm which accounts were unlocked, disabled, or otherwise modified.
+- Use the output to report status to a manager or security team.
+- Verify that the changes match the intended administrative actions.
+- Keep this step as part of routine administrative auditing.
+
+**14. Review the automation script and documentation** [18:25](https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81?t=1105)
+
+![generated-image-at-00:18:25](https://loom.com/i/71e028225b7f4baaa13358aa8190fd03?workflows_screenshot=true)
+
+- Open the lab automation script in the GitHub repository.
+- Review the script sections that match each lab task.
+- Use the region markers to run individual blocks as needed.
+- Read the inline comments to understand both the command and the business reason behind it.
+- Use the README and screenshots to verify each step and map the lab to real job tasks.
+
+### Cautionary Notes
+
+- Do not delete user accounts when a simple disable action is sufficient; deletion removes audit history and can create compliance issues.
+- Always verify PowerShell syntax before running commands; incorrect syntax will generate errors and may prevent changes from applying.
+- Be careful when editing Group Policy Objects, since linked policies can affect all users and computers in the targeted OU.
+- Use clipboard sharing in RDP only in a controlled lab or approved environment.
+- Ensure you are working in the correct OU and on the correct user account before making changes.
+
+### Tips for Efficiency
+
+- Use PowerShell ISE or another editor to reduce typing errors and make commands easier to review.
+- Keep the lab script in a repository so each task can be rerun quickly and consistently.
+- Organize users, groups, and computers by OU from the start to make Group Policy easier to manage.
+- Prefer group-based permissions over direct user permissions to simplify administration at scale.
+- Use verification commands after each major change to confirm success before moving to the next step.
+- Document each change with comments or screenshots so the lab can be repeated or audited later.
+
+### Link to Loom
+
+<https://loom.com/share/6e8394eb254a4af2bf66ff90e17feb81>
+
+
