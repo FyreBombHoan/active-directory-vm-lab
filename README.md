@@ -111,6 +111,10 @@ Step 1 — Provision the Environment
 RDP into the VM. Server Manager opens automatically on login. All configuration from here runs inside the VM.
 
 📸 Screenshot — Azure VM running + RDP clipboard setting enabled
+<img width="1905" height="949" alt="Screenshot The Environment Step 1_Section 1_2" src="https://github.com/user-attachments/assets/bc0bd6ce-c299-4a0d-a2aa-a5c9fc828d1d" />
+
+<img width="1382" height="770" alt="Screenshot The Environment Step 1_Section 1_4_network" src="https://github.com/user-attachments/assets/6c13387d-d570-47f5-b57c-51330d763a8e" />
+
 
 Step 2 — Install Active Directory Domain Services
 What is a Domain Controller? A Domain Controller (DC) is the brain of Active Directory. Every login attempt on the domain is authenticated against the DC. Every user account lives on the DC. There is typically more than one in production for redundancy — we are building one here as the foundation.
@@ -125,6 +129,10 @@ Install-WindowsFeature -Name AD-Domain-Services -IncludeManagementTools
 # Also install Group Policy Management Console (required for Step 5)
 Install-WindowsFeature -Name GPMC
 📸 Screenshot — AD DS role selected in Add Roles wizard + install complete
+
+<img width="1842" height="895" alt="Screenshot Install Active Directory Domain Services Step 2_Section 2" src="https://github.com/user-attachments/assets/d10936ee-a7f4-4f86-9611-b5ed62df4fb3" />
+<img width="851" height="621" alt="Screenshot Install Active Directory Domain Services Step 2_Section 2_2" src="https://github.com/user-attachments/assets/c2ca29d0-b417-4e15-884c-570adb0cfb8e" />
+<img width="928" height="622" alt="Screenshot Install Active Directory Domain Services Step 2_Section 2_5" src="https://github.com/user-attachments/assets/92cab35f-c81d-483c-8297-aeed4276c080" />
 
 Why install GPMC now? Step 5 requires the Group Policy Management Console — a separate tool from Active Directory Users and Computers. Installing it here means it's ready when you need it. After installation, it appears under Tools in Server Manager.
 
